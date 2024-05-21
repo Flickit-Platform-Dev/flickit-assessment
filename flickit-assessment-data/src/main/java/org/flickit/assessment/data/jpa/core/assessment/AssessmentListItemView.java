@@ -9,4 +9,6 @@ public interface AssessmentListItemView {
     boolean getIsCalculateValid();
 
     boolean getIsConfidenceValid();
+
+    boolean getManageable();
 }

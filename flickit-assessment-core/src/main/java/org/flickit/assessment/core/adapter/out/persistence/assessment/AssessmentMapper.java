@@ -63,7 +63,8 @@ public class AssessmentMapper {
             assessmentEntity.getLastModificationTime(),
             itemView.getMaturityLevelId(),
             itemView.getIsCalculateValid(),
-            itemView.getIsConfidenceValid()
+            itemView.getIsConfidenceValid(),
+            itemView.getManageable()
         );
     }
 
