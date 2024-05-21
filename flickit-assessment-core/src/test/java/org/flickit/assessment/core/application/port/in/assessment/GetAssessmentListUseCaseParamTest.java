@@ -48,9 +48,10 @@ class GetAssessmentListUseCaseParamTest {
 
     @Test
     void testGetAssessmentList_NullCurrentUserId_ErrorMessage() {
+        List<Long> spaceIds = List.of(1L, 2L);
         var throwable = assertThrows(ConstraintViolationException.class,
             () -> new GetAssessmentListUseCase.Param(
-                null,
+                spaceIds,
                 null,
                 null,
                 20,
