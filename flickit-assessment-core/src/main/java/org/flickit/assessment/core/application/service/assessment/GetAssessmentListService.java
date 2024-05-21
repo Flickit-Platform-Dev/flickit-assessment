@@ -19,6 +19,7 @@ public class GetAssessmentListService implements GetAssessmentListUseCase {
         return loadAssessmentsBySpace.loadNotDeletedAssessments(
             param.getSpaceIds(),
             param.getKitId(),
+            param.getCurrentUserId(),
             param.getPage(),
             param.getSize()
         );

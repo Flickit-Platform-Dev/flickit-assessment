@@ -3,6 +3,7 @@ package org.flickit.assessment.core.application.port.in.assessment;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.flickit.assessment.common.application.SelfValidating;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static org.flickit.assessment.common.error.ErrorMessageKey.COMMON_CURRENT_USER_ID_NOT_NULL;
 import static org.flickit.assessment.core.common.ErrorMessageKey.*;
 
 public interface GetAssessmentListUseCase {
@@ -28,6 +30,9 @@ public interface GetAssessmentListUseCase {
 
         Long kitId;
 
+        @NotNull(message = COMMON_CURRENT_USER_ID_NOT_NULL)
+        UUID currentUserId;
+
         @Min(value = 1, message = GET_ASSESSMENT_LIST_SIZE_MIN)
         @Max(value = 100, message = GET_ASSESSMENT_LIST_SIZE_MAX)
         int size;
@@ -35,9 +40,10 @@ public interface GetAssessmentListUseCase {
         @Min(value = 0, message = GET_ASSESSMENT_LIST_PAGE_MIN)
         int page;
 
-        public Param(List<Long> spaceIds, Long kitId, int size, int page) {
+        public Param(List<Long> spaceIds, Long kitId, UUID currentUserId, int size, int page) {
             this.spaceIds = spaceIds;
             this.kitId = kitId;
+            this.currentUserId = currentUserId;
             this.size = size;
             this.page = page;
             this.validateSelf();
@@ -53,7 +59,8 @@ public interface GetAssessmentListUseCase {
         LocalDateTime lastModificationTime,
         Long maturityLevelId,
         boolean isCalculateValid,
-        boolean isConfidenceValid
+        boolean isConfidenceValid,
+        boolean manageable
     ) {
     }
 }
