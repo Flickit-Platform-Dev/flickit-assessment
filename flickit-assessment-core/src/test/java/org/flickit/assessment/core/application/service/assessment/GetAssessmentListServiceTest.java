@@ -17,6 +17,7 @@ import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -36,6 +37,7 @@ class GetAssessmentListServiceTest {
         Long spaceId = 1L;
         Long kitId = AssessmentKitMother.kit().getId();
         List<Long> spaceIds = List.of(spaceId);
+        UUID currentUserId = UUID.randomUUID();
         AssessmentListItem assessment1S1 = AssessmentMother.assessmentListItem(spaceId, kitId);
         AssessmentListItem assessment2S1 = AssessmentMother.assessmentListItem(spaceId, kitId);
 
@@ -46,15 +48,16 @@ class GetAssessmentListServiceTest {
             "lastModificationTime",
             "DESC",
             2);
-        when(loadAssessmentPort.loadNotDeletedAssessments(spaceIds, null, 0, 10)).thenReturn(paginatedResponse);
+        when(loadAssessmentPort.loadNotDeletedAssessments(spaceIds, null, currentUserId, 0, 10)).thenReturn(paginatedResponse);
 
-        PaginatedResponse<AssessmentListItem> result = service.getAssessmentList(new GetAssessmentListUseCase.Param(spaceIds, null, 10, 0));
+        PaginatedResponse<AssessmentListItem> result = service.getAssessmentList(new GetAssessmentListUseCase.Param(spaceIds, null, currentUserId, 10, 0));
         assertEquals(paginatedResponse, result);
     }
 
     @Test
     void testGetAssessmentList_NoResultsFound_NoItemReturned() {
         List<Long> spaceIds = List.of(2L);
+        UUID currentUserId = UUID.randomUUID();
 
         PaginatedResponse<AssessmentListItem> paginatedResponse = new PaginatedResponse<>(
             new ArrayList<>(),
@@ -63,14 +66,15 @@ class GetAssessmentListServiceTest {
             "lastModificationTime",
             "DESC",
             2);
-        when(loadAssessmentPort.loadNotDeletedAssessments(spaceIds, null, 0, 10)).thenReturn(paginatedResponse);
+        when(loadAssessmentPort.loadNotDeletedAssessments(spaceIds, null, currentUserId, 0, 10)).thenReturn(paginatedResponse);
 
-        PaginatedResponse<AssessmentListItem> result = service.getAssessmentList(new GetAssessmentListUseCase.Param(spaceIds, null, 10, 0));
+        PaginatedResponse<AssessmentListItem> result = service.getAssessmentList(new GetAssessmentListUseCase.Param(spaceIds, null, currentUserId, 10, 0));
         assertEquals(paginatedResponse, result);
     }
 
     @Test
     void testGetAssessmentList_ResultsFoundForSpaceIds_ItemsReturned() {
+        UUID currentUserId = UUID.randomUUID();
         Long kitId = AssessmentKitMother.kit().getId();
         var assessment1 = AssessmentMother.assessmentListItem(1L, kitId);
         var assessment2 = AssessmentMother.assessmentListItem(2L, kitId);
@@ -85,24 +89,27 @@ class GetAssessmentListServiceTest {
             2
         );
 
-        when(loadAssessmentPort.loadNotDeletedAssessments(spaceIds, null, 0, 20))
+        when(loadAssessmentPort.loadNotDeletedAssessments(spaceIds, null, currentUserId, 0, 20))
             .thenReturn(paginatedRes);
 
-        var param = new GetAssessmentListUseCase.Param(spaceIds, null, 20, 0);
+        var param = new GetAssessmentListUseCase.Param(spaceIds, null, currentUserId, 20, 0);
         var assessments = service.getAssessmentList(param);
 
         ArgumentCaptor<List<Long>> spaceIdsArgument = ArgumentCaptor.forClass(List.class);
         ArgumentCaptor<Long> kitIdArgument = ArgumentCaptor.forClass(Long.class);
+        ArgumentCaptor<UUID> currentUserIdArgument = ArgumentCaptor.forClass(UUID.class);
         ArgumentCaptor<Integer> sizeArgument = ArgumentCaptor.forClass(Integer.class);
         ArgumentCaptor<Integer> pageArgument = ArgumentCaptor.forClass(Integer.class);
         verify(loadAssessmentPort).loadNotDeletedAssessments(
             spaceIdsArgument.capture(),
             kitIdArgument.capture(),
+            currentUserIdArgument.capture(),
             pageArgument.capture(),
             sizeArgument.capture());
 
         assertEquals(spaceIds, spaceIdsArgument.getValue());
         assertNull(kitIdArgument.getValue());
+        assertEquals(currentUserId, currentUserIdArgument.getValue());
         assertEquals(20, sizeArgument.getValue());
         assertEquals(0, pageArgument.getValue());
 
@@ -113,11 +120,12 @@ class GetAssessmentListServiceTest {
         assertEquals(Sort.Direction.DESC.name().toLowerCase(), assessments.getOrder());
         assertEquals(AssessmentJpaEntity.Fields.LAST_MODIFICATION_TIME, assessments.getSort());
 
-        verify(loadAssessmentPort, times(1)).loadNotDeletedAssessments(any(), any(), anyInt(), anyInt());
+        verify(loadAssessmentPort, times(1)).loadNotDeletedAssessments(any(), any(), any(UUID.class), anyInt(), anyInt());
     }
 
     @Test
     void testGetAssessmentList_ResultsFoundForSpaceIdsWithKit_ItemsReturned() {
+        UUID currentUserId = UUID.randomUUID();
         Long spaceId = 1L;
         Long kitId = AssessmentKitMother.kit().getId();
         var assessment1 = AssessmentMother.assessmentListItem(1L, kitId);
@@ -133,9 +141,9 @@ class GetAssessmentListServiceTest {
             2
         );
 
-        when(loadAssessmentPort.loadNotDeletedAssessments(spaceIds, kitId, 0, 20)).thenReturn(paginatedRes);
+        when(loadAssessmentPort.loadNotDeletedAssessments(spaceIds, kitId, currentUserId, 0, 20)).thenReturn(paginatedRes);
 
-        var param = new GetAssessmentListUseCase.Param(spaceIds, kitId, 20, 0);
+        var param = new GetAssessmentListUseCase.Param(spaceIds, kitId, currentUserId, 20, 0);
         var assessments = service.getAssessmentList(param);
 
         assertEquals(2, assessments.getItems().size());

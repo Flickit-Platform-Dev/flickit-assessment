@@ -56,7 +56,8 @@ public class AssessmentMother {
             LocalDateTime.now(),
             1L,
             Boolean.TRUE,
-            Boolean.TRUE
+            Boolean.TRUE,
+            Boolean.FALSE
         );
     }
 }
