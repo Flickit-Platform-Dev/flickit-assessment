@@ -23,7 +23,7 @@ public interface AssessmentJpaRepository extends JpaRepository<AssessmentJpaEnti
             r.isCalculateValid as isCalculateValid,
             r.isConfidenceValid as isConfidenceValid,
             CASE
-                WHEN ur.roleId = :managerRoleId OR a.createdBy = :currentUserId OR space.createdBy = :currentUserId THEN TRUE
+                WHEN ur.roleId = :managerRoleId OR space.createdBy = :currentUserId THEN TRUE
                 ELSE FALSE
             END as manageable
         FROM AssessmentJpaEntity a
