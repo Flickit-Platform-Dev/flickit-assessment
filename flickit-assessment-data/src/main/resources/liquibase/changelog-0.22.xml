@@ -11,9 +11,48 @@
                    sp.owner_id AS user_id,
                    3           AS role_id
             FROM fac_assessment a
-                     JOIN fau_space sp ON a.space_id = sp.id
-            ON CONFLICT (assessment_id, user_id)
-            DO UPDATE SET role_id = EXCLUDED.role_id;
+                     JOIN fau_space sp ON a.space_id = sp.id ON CONFLICT (assessment_id, user_id)
+            DO
+            UPDATE SET role_id = EXCLUDED.role_id;
         </sql>
+    </changeSet>
+
+    <changeSet id="0.22-02" author="Mahdi Rezazadeh">
+        <createTable tableName="fac_answer_AUD">
+            <column name="id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="REV" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="REVTYPE" type="smallint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="answer_option_id" type="bigint"/>
+            <column name="confidence_level_id" type="tinyint"/>
+            <column name="is_not_applicable" type="boolean"/>
+            <column name="last_modified_by" type="uuid"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="0.22-03" author="Mahdi Rezazadeh">
+        <addPrimaryKey columnNames="id, REV" constraintName="pk_fac_answer_AUD" tableName="fac_answer_AUD"/>
+    </changeSet>
+
+    <changeSet id="0.22-04" author="Mahdi Rezazadeh">
+        <createTable tableName="revinfo">
+            <column name="REV" type="bigint">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="REVTSTMP" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="changedBy" type="uuid"/>
+            <column name="changedAt" type="bigint"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="0.22-05" author="Mahdi Rezazadeh">
+        <createSequence sequenceName="revinfo_id_seq"/>
     </changeSet>
 </databaseChangeLog>
