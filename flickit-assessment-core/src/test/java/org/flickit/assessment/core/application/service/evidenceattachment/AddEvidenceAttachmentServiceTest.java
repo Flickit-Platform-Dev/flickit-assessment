@@ -9,10 +9,11 @@ import org.flickit.assessment.core.application.domain.Evidence;
 import org.flickit.assessment.core.application.port.in.evidenceattachment.AddEvidenceAttachmentUseCase.Param;
 import org.flickit.assessment.core.application.port.out.evidence.LoadEvidencePort;
 import org.flickit.assessment.core.application.port.out.evidenceattachment.CountEvidenceAttachmentsPort;
-import org.flickit.assessment.core.application.port.out.evidenceattachment.UploadEvidenceAttachmentPort;
 import org.flickit.assessment.core.application.port.out.evidenceattachment.CreateEvidenceAttachmentPort;
+import org.flickit.assessment.core.application.port.out.evidenceattachment.UploadEvidenceAttachmentPort;
 import org.flickit.assessment.core.application.port.out.minio.CreateFileDownloadLinkPort;
 import org.flickit.assessment.core.test.fixture.application.EvidenceMother;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -20,7 +21,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
-import org.junit.jupiter.api.DisplayName;
 import org.springframework.util.unit.DataSize;
 
 import java.time.Duration;
@@ -30,9 +30,10 @@ import java.util.UUID;
 
 import static org.flickit.assessment.common.error.ErrorMessageKey.*;
 import static org.flickit.assessment.core.common.ErrorMessageKey.ADD_EVIDENCE_ATTACHMENT_ATTACHMENT_COUNT_MAX;
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.flickit.assessment.core.common.ErrorMessageKey.EVIDENCE_ID_NOT_FOUND;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AddEvidenceAttachmentServiceTest {
@@ -160,7 +161,7 @@ class AddEvidenceAttachmentServiceTest {
 
     @Test
     @DisplayName("Adding an attachment for an 'evidence' should be bound to the maximum size of attachments.")
-    void addEvidenceAttachment_exceedMaxMaxSize_ValidationError() {
+    void addEvidenceAttachment_exceedMaxSize_ValidationError() {
         var evidenceId = UUID.randomUUID();
         var description = "Some description";
         MockMultipartFile attachment = new MockMultipartFile("attachment", "attachment.txt", "text/plain", new byte[6 * 1024 * 1024]);
@@ -174,7 +175,35 @@ class AddEvidenceAttachmentServiceTest {
         when(assessmentAccessChecker.isAuthorized(any(), any(), any())).thenReturn(true);
         when(fileProperties.getAttachmentMaxCount()).thenReturn(5);
         when(countEvidenceAttachmentsPort.countAttachments(evidenceId)).thenReturn(4);
+        when(fileProperties.getAttachmentContentTypes()).thenReturn(List.of("text/plain"));
         when(fileProperties.getAttachmentMaxSize()).thenReturn(DataSize.ofMegabytes(5));
+
+        var throwable = assertThrows(ValidationException.class, () -> service.addAttachment(param),
+            "When the attachments are more than the predefined maximum file size, adding an attachment should fail with ValidationException");
+
+        assertEquals(UPLOAD_FILE_SIZE_MAX, throwable.getMessage());
+        verifyNoInteractions(uploadEvidenceAttachmentPort, createEvidenceAttachmentPort, createFileDownloadLinkPort);
+    }
+
+    @Test
+    @DisplayName("Adding a video attachment for an 'evidence' should be bound to the maximum size of attachments.")
+    void addEvidenceVideoAttachment_exceedMaxSize_ValidationError() {
+        var evidenceId = UUID.randomUUID();
+        var description = "Some description";
+        MockMultipartFile attachment = new MockMultipartFile("attachment", "attachment.mp4", "video/mp4", new byte[51 * 1024 * 1024]);
+        var currentUserId = UUID.randomUUID();
+        var time = LocalDateTime.now();
+        var param = new Param(evidenceId, attachment, description, currentUserId);
+        var evidence = new Evidence(evidenceId, "des", currentUserId, currentUserId, UUID.randomUUID(),
+            0L, 1, time, time, false);
+
+        when(loadEvidencePort.loadNotDeletedEvidence(evidenceId)).thenReturn(evidence);
+        when(assessmentAccessChecker.isAuthorized(any(), any(), any())).thenReturn(true);
+        when(fileProperties.getAttachmentMaxCount()).thenReturn(5);
+        when(countEvidenceAttachmentsPort.countAttachments(evidenceId)).thenReturn(4);
+        when(fileProperties.getAttachmentContentTypes()).thenReturn(List.of("text/plain", "video/mp4"));
+        when(fileProperties.getVideoContentTypes()).thenReturn(List.of("video/mp4"));
+        when(fileProperties.getVideoMaxSize()).thenReturn(DataSize.ofMegabytes(50));
 
         var throwable = assertThrows(ValidationException.class, () -> service.addAttachment(param),
             "When the attachments are more than the predefined maximum file size, adding an attachment should fail with ValidationException");
@@ -199,7 +228,6 @@ class AddEvidenceAttachmentServiceTest {
         when(assessmentAccessChecker.isAuthorized(any(), any(), any())).thenReturn(true);
         when(fileProperties.getAttachmentMaxCount()).thenReturn(5);
         when(countEvidenceAttachmentsPort.countAttachments(evidenceId)).thenReturn(4);
-        when(fileProperties.getAttachmentMaxSize()).thenReturn(DataSize.ofMegabytes(5));
         when(fileProperties.getAttachmentContentTypes()).thenReturn(List.of("text/plain"));
 
         var throwable = assertThrows(ValidationException.class, () -> service.addAttachment(param),

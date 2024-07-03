@@ -8,8 +8,8 @@ import org.flickit.assessment.common.exception.ValidationException;
 import org.flickit.assessment.core.application.port.in.evidenceattachment.AddEvidenceAttachmentUseCase;
 import org.flickit.assessment.core.application.port.out.evidence.LoadEvidencePort;
 import org.flickit.assessment.core.application.port.out.evidenceattachment.CountEvidenceAttachmentsPort;
-import org.flickit.assessment.core.application.port.out.evidenceattachment.UploadEvidenceAttachmentPort;
 import org.flickit.assessment.core.application.port.out.evidenceattachment.CreateEvidenceAttachmentPort;
+import org.flickit.assessment.core.application.port.out.evidenceattachment.UploadEvidenceAttachmentPort;
 import org.flickit.assessment.core.application.port.out.minio.CreateFileDownloadLinkPort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,8 +19,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static org.flickit.assessment.common.error.ErrorMessageKey.*;
 import static org.flickit.assessment.common.application.domain.assessment.AssessmentPermission.ADD_EVIDENCE_ATTACHMENT;
+import static org.flickit.assessment.common.error.ErrorMessageKey.*;
 import static org.flickit.assessment.core.common.ErrorMessageKey.ADD_EVIDENCE_ATTACHMENT_ATTACHMENT_COUNT_MAX;
 
 @Service
@@ -59,10 +59,14 @@ public class AddEvidenceAttachmentService implements AddEvidenceAttachmentUseCas
         if (countEvidenceAttachmentsPort.countAttachments(evidenceId) >= fileProperties.getAttachmentMaxCount())
             throw new ValidationException(ADD_EVIDENCE_ATTACHMENT_ATTACHMENT_COUNT_MAX);
 
-        if (attachment.getSize() > fileProperties.getAttachmentMaxSize().toBytes())
-            throw new ValidationException(UPLOAD_FILE_SIZE_MAX);
-
         if (!fileProperties.getAttachmentContentTypes().contains(attachment.getContentType()))
             throw new ValidationException(UPLOAD_FILE_FORMAT_NOT_VALID);
+
+        if (fileProperties.getVideoContentTypes().contains(attachment.getContentType())) {
+            if (attachment.getSize() > fileProperties.getVideoMaxSize().toBytes())
+                throw new ValidationException(UPLOAD_FILE_SIZE_MAX);
+        } else if (attachment.getSize() > fileProperties.getAttachmentMaxSize().toBytes()) {
+            throw new ValidationException(UPLOAD_FILE_SIZE_MAX);
+        }
     }
 }

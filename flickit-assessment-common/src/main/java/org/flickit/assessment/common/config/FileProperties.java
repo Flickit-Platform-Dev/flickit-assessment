@@ -31,6 +31,9 @@ public class FileProperties {
     Integer attachmentMaxCount = 5;
 
     @NotNull
+    DataSize videoMaxSize = DataSize.ofMegabytes(50);
+
+    @NotNull
     private List<String> pictureContentTypes = Arrays.asList(
         "image/jpeg",
         "image/png",
@@ -39,11 +42,29 @@ public class FileProperties {
     );
 
     @NotNull
+    private List<String> videoContentTypes = Arrays.asList(
+        "video/mp4",
+        "video/mpeg",
+        "video/ogg",
+        "video/quicktime",
+        "video/webm",
+        "application/x-troff-msvideo",
+        "video/x-sgi-movie"
+    );
+
+    @NotNull
     private List<String> attachmentContentTypes = Arrays.asList(
         "image/jpeg",
         "image/png",
         "image/gif",
         "image/bmp",
+        "video/mp4",
+        "video/mpeg",
+        "video/ogg",
+        "video/quicktime",
+        "video/webm",
+        "application/x-troff-msvideo",
+        "video/x-sgi-movie",
         "text/plain",
         "application/pdf",
         "application/x-zip",
