@@ -26,6 +26,15 @@ public interface ExpertGroupJpaRepository extends JpaRepository<ExpertGroupJpaEn
     Optional<ExpertGroupJpaEntity> findByKitId(@Param("kitId") long kitId);
 
     @Query("""
+            SELECT e
+            FROM ExpertGroupJpaEntity e
+            LEFT JOIN AssessmentKitJpaEntity a On e.id = a.expertGroupId
+            LEFT JOIN KitVersionJpaEntity kv ON a.id = kv.kit.id
+            WHERE kv.id = :kitVersionId AND e.deleted = false
+        """)
+    Optional<ExpertGroupJpaEntity> findByKitVersionId(@Param("kitVersionId") long kitVersionId);
+
+    @Query("""
             SELECT
                 e.id as id,
                 e.title as title,
