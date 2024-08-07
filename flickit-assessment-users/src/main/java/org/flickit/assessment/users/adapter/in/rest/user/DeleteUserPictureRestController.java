@@ -2,8 +2,8 @@ package org.flickit.assessment.users.adapter.in.rest.user;
 
 import lombok.RequiredArgsConstructor;
 import org.flickit.assessment.common.config.jwt.UserContext;
-import org.flickit.assessment.users.application.port.in.user.DeletePictureUseCase;
-import org.flickit.assessment.users.application.port.in.user.DeletePictureUseCase.Param;
+import org.flickit.assessment.users.application.port.in.user.DeleteUserPictureUseCase;
+import org.flickit.assessment.users.application.port.in.user.DeleteUserPictureUseCase.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,7 +15,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DeleteUserPictureRestController {
 
-    private final DeletePictureUseCase useCase;
+    private final DeleteUserPictureUseCase useCase;
     private final UserContext userContext;
 
     @DeleteMapping("/users/picture")

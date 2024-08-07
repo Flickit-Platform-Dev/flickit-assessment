@@ -1,7 +1,7 @@
 package org.flickit.assessment.users.application.service.user;
 
 import org.flickit.assessment.common.exception.ResourceNotFoundException;
-import org.flickit.assessment.users.application.port.in.user.DeletePictureUseCase.Param;
+import org.flickit.assessment.users.application.port.in.user.DeleteUserPictureUseCase.Param;
 import org.flickit.assessment.users.application.port.out.minio.DeleteFilePort;
 import org.flickit.assessment.users.application.port.out.user.LoadUserPort;
 import org.flickit.assessment.users.application.port.out.user.UpdateUserPicturePort;
@@ -20,10 +20,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class DeletePictureServiceTest {
+class DeleteUserPictureServiceTest {
 
     @InjectMocks
-    DeletePictureService service;
+    DeleteUserPictureService service;
 
     @Mock
     LoadUserPort loadUserPort;

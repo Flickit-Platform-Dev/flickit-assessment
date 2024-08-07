@@ -7,7 +7,9 @@ import org.flickit.assessment.common.application.SelfValidating;
 
 import java.util.UUID;
 
-public interface DeletePictureUseCase {
+import static org.flickit.assessment.common.error.ErrorMessageKey.COMMON_CURRENT_USER_ID_NOT_NULL;
+
+public interface DeleteUserPictureUseCase {
 
     void delete(Param param);
 

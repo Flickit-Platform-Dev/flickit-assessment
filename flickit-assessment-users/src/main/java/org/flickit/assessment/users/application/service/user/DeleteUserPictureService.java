@@ -1,7 +1,7 @@
 package org.flickit.assessment.users.application.service.user;
 
 import lombok.RequiredArgsConstructor;
-import org.flickit.assessment.users.application.port.in.user.DeletePictureUseCase;
+import org.flickit.assessment.users.application.port.in.user.DeleteUserPictureUseCase;
 import org.flickit.assessment.users.application.port.out.minio.DeleteFilePort;
 import org.flickit.assessment.users.application.port.out.user.LoadUserPort;
 import org.flickit.assessment.users.application.port.out.user.UpdateUserPicturePort;
@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class DeletePictureService implements DeletePictureUseCase {
+public class DeleteUserPictureService implements DeleteUserPictureUseCase {
 
     private final LoadUserPort loadUserPort;
     private final UpdateUserPicturePort updateUserPicturePort;
