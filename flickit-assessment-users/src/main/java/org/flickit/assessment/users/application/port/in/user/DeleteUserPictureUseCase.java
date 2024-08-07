@@ -17,12 +17,12 @@ public interface DeleteUserPictureUseCase {
     @EqualsAndHashCode(callSuper = false)
     class Param extends SelfValidating<Param> {
 
-        @NotNull
-        UUID userId;
+        @NotNull(message = COMMON_CURRENT_USER_ID_NOT_NULL)
+        UUID currentUserId;
 
-        public Param(UUID userId) {
+        public Param(UUID currentUserId) {
 
-            this.userId = userId;
+            this.currentUserId = currentUserId;
             this.validateSelf();
         }
     }

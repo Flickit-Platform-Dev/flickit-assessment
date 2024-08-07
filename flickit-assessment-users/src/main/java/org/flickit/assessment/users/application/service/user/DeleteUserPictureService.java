@@ -19,7 +19,7 @@ public class DeleteUserPictureService implements DeleteUserPictureUseCase {
 
     @Override
     public void delete(Param param) {
-        var user = loadUserPort.loadUser(param.getUserId());
+        var user = loadUserPort.loadUser(param.getCurrentUserId());
         var picture = user.getPicturePath();
         if (picture != null && !picture.isBlank()) {
             updateUserPicturePort.updatePicture(user.getId(), null);
