@@ -1015,6 +1015,44 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Update Users Picture",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{authorization_header}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "pictureFile",
+							"type": "file",
+							"src": "/home/maziyar/Pictures/index.png"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/{{api_path}}/users/picture",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_path}}",
+						"users",
+						"picture"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"event": [
