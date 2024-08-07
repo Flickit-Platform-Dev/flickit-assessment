@@ -1015,6 +1015,30 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Delete User Picture",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{authorization_header}}"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/{{api_path}}/users/picture",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_path}}",
+						"users",
+						"picture"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"event": [
