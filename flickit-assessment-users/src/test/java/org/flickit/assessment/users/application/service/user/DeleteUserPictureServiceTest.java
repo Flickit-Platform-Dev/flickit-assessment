@@ -49,7 +49,7 @@ class DeleteUserPictureServiceTest {
     }
 
     @Test
-    void testDeleteUserPicture_ValidParameters_Successful() {
+    void testDeleteUserPicture_ValidParametersWithPicture_Successful() {
         var userId = UUID.randomUUID();
         var param = new Param(userId);
         var user = UserMother.createUserWithId(userId);
@@ -57,7 +57,6 @@ class DeleteUserPictureServiceTest {
         when(loadUserPort.loadUser(any(UUID.class))).thenReturn(user);
         doNothing().when(updateUserPicturePort).updatePicture(userId, null);
         doNothing().when(deleteFilePort).deletePicture(user.getPicturePath());
-
 
         assertDoesNotThrow(() -> service.delete(param));
 
