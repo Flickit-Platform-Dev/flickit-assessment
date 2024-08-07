@@ -21,7 +21,6 @@ public interface DeleteUserPictureUseCase {
         UUID currentUserId;
 
         public Param(UUID currentUserId) {
-
             this.currentUserId = currentUserId;
             this.validateSelf();
         }
