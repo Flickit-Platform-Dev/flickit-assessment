@@ -29,6 +29,7 @@ public class SendNotificationNovuAdapter implements SendNotificationPort {
         var converter = converters.get(envelope.payload().getClass());
         TriggerEventRequest triggerEventRequest = converter.convert(envelope);
         try {
+            triggerEventRequest.setName(converter.notificationType().getCode());
             novu.triggerEvent(triggerEventRequest);
         } catch (Exception e) {
             log.error("Failed to send notification[targetUserId={}, payload=[{}].",

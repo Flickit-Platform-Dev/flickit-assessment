@@ -8,5 +8,7 @@ public interface NovuRequestConverter {
 
     TriggerEventRequest convert(NotificationEnvelope envelope);
 
+    NotificationType notificationType();
+
     Class<? extends NotificationPayload> payloadClass();
 }
