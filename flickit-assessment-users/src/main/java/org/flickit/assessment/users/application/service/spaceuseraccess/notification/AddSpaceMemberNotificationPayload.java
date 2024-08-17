@@ -4,7 +4,7 @@ import org.flickit.assessment.common.application.domain.notification.Notificatio
 
 import java.util.UUID;
 
-public record AddSpaceMemberNotificationPayload(SpaceModel spaceMode, UserModel inviter) implements NotificationPayload {
+public record AddSpaceMemberNotificationPayload(SpaceModel spaceModel, UserModel inviter) implements NotificationPayload {
 
     public record SpaceModel(Long id, String title) {
     }
