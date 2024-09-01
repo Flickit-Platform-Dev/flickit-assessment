@@ -1,6 +1,7 @@
 package org.flickit.assessment.users.application.service.spaceuseraccess;
 
 import lombok.RequiredArgsConstructor;
+import org.flickit.assessment.common.application.domain.notification.SendNotification;
 import org.flickit.assessment.common.exception.AccessDeniedException;
 import org.flickit.assessment.common.exception.ResourceAlreadyExistsException;
 import org.flickit.assessment.common.exception.ResourceNotFoundException;
@@ -9,6 +10,7 @@ import org.flickit.assessment.users.application.port.in.spaceuseraccess.AddSpace
 import org.flickit.assessment.users.application.port.out.spaceuseraccess.CheckSpaceAccessPort;
 import org.flickit.assessment.users.application.port.out.spaceuseraccess.CreateSpaceUserAccessPort;
 import org.flickit.assessment.users.application.port.out.user.LoadUserPort;
+import org.flickit.assessment.users.application.service.spaceuseraccess.notification.AddSpaceMemberNotificationCmd;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +31,8 @@ public class AddSpaceMemberService implements AddSpaceMemberUseCase {
     private final CreateSpaceUserAccessPort createSpaceUserAccessPort;
 
     @Override
-    public void addMember(Param param) {
+    @SendNotification
+    public Result addMember(Param param) {
         UUID currentUserId = param.getCurrentUserId();
         long spaceId = param.getSpaceId();
 
@@ -46,5 +49,11 @@ public class AddSpaceMemberService implements AddSpaceMemberUseCase {
 
         var access = new SpaceUserAccess(spaceId, userId, currentUserId, LocalDateTime.now());
         createSpaceUserAccessPort.persist(access);
+
+        return new Result(new AddSpaceMemberNotificationCmd(
+            userId,
+            spaceId,
+            currentUserId
+        ));
     }
 }

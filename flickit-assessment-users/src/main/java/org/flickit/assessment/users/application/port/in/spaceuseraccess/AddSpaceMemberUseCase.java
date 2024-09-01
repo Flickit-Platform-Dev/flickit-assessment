@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Pattern;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.flickit.assessment.common.application.SelfValidating;
+import org.flickit.assessment.common.application.domain.notification.HasNotificationCmd;
+import org.flickit.assessment.common.application.domain.notification.NotificationCmd;
 
 import java.util.UUID;
 
@@ -15,7 +17,7 @@ import static org.flickit.assessment.users.common.ErrorMessageKey.ADD_SPACE_MEMB
 
 public interface AddSpaceMemberUseCase {
 
-    void addMember(Param param);
+    Result addMember(Param param);
 
     @Value
     @EqualsAndHashCode(callSuper = false)
@@ -37,5 +39,8 @@ public interface AddSpaceMemberUseCase {
             this.currentUserId = currentUserId;
             this.validateSelf();
         }
+    }
+
+    record Result(NotificationCmd notificationCmd) implements HasNotificationCmd {
     }
 }

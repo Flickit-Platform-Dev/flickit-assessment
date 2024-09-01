@@ -8,7 +8,7 @@ import org.flickit.assessment.users.application.port.in.spaceuseraccess.AddSpace
 import org.flickit.assessment.users.application.port.out.spaceuseraccess.CheckSpaceAccessPort;
 import org.flickit.assessment.users.application.port.out.spaceuseraccess.CreateSpaceUserAccessPort;
 import org.flickit.assessment.users.application.port.out.user.LoadUserPort;
-import org.junit.jupiter.api.DisplayName;
+import org.flickit.assessment.users.application.service.spaceuseraccess.notification.AddSpaceMemberNotificationCmd;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -40,28 +40,36 @@ class AddSpaceMemberServiceTest {
     private CreateSpaceUserAccessPort createSpaceUserAccessPort;
 
     @Test
-    @DisplayName("Adding a valid member to a valid space should cause a successful addition")
     void testAddSpaceMember_validParameters_successful() {
         long spaceId = 0;
         String email = "admin@asta.org";
         UUID currentUserId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
         var param = new AddSpaceMemberUseCase.Param(spaceId, email, currentUserId);
+        var notificationData = new AddSpaceMemberNotificationCmd(userId,
+            param.getSpaceId(),
+            currentUserId);
 
         when(checkSpaceAccessPort.checkIsMember(spaceId, currentUserId)).thenReturn(true);
         when(loadUserPort.loadUserIdByEmail(email)).thenReturn(Optional.of(userId));
         when(checkSpaceAccessPort.checkIsMember(spaceId, userId)).thenReturn(false);
         doNothing().when(createSpaceUserAccessPort).persist(isA(SpaceUserAccess.class));
 
-        assertDoesNotThrow(() -> service.addMember(param));
+        var result = assertDoesNotThrow(() -> service.addMember(param));
+
+        AddSpaceMemberNotificationCmd cmd = (AddSpaceMemberNotificationCmd) result.notificationCmd();
+
+        assertEquals(notificationData.targetUserId(), cmd.targetUserId());
+        assertEquals(notificationData.spaceId(), cmd.spaceId());
+        assertEquals(notificationData.inviterUserId(), cmd.inviterUserId());
 
         verify(checkSpaceAccessPort, times(2)).checkIsMember(anyLong(), any(UUID.class));
+        verify(loadUserPort).loadUserIdByEmail(email);
         verify(loadUserPort).loadUserIdByEmail(email);
         verify(createSpaceUserAccessPort).persist(any(SpaceUserAccess.class));
     }
 
     @Test
-    @DisplayName("Adding a member to a valid space should be done by a member; otherwise causes AccessDeniedException")
     void testAddSpaceMember_inviterIsNotSpaceMember_AccessDeniedExceptionException() {
         long spaceId = 0;
         String email = "admin@asta.org";
@@ -79,7 +87,6 @@ class AddSpaceMemberServiceTest {
     }
 
     @Test
-    @DisplayName("Adding a non-flickit user to a space should cause ResourceNotFoundException")
     void testAddSpaceMember_inviteeIsNotFlickitUser_ResourceNotFoundException() {
         long spaceId = 0;
         String email = "admin@asta.org";
@@ -98,7 +105,6 @@ class AddSpaceMemberServiceTest {
     }
 
     @Test
-    @DisplayName("Adding an already-member user to a space should cause ResourceAlreadyExistsException")
     void testAddSpaceMember_inviteeIsMember_ResourceAlreadyExistsException() {
         long spaceId = 0;
         String email = "admin@asta.org";
